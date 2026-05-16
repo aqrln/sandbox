@@ -1,0 +1,5 @@
+/home/*
+!/home/.config
+/home/.config/*
+!/home/.config/fish
+/home/.config/fish/fish_variables
