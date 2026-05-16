@@ -7,9 +7,10 @@ let sandbox_home = $"($env.FILE_PWD)/home"
 def main [
     --no-krun (-c)  # Disable virtualization via krun and run the container on the host kernel
     --host-net (-n) # Share the network with the host (implies `--no-krun`)
+    --isolated      # Do not mount the current directory as /work or set it as the container cwd
 ] {
     build-container
-    run-container $no_krun $host_net
+    run-container $no_krun $host_net $isolated
 }
 
 def build-container [] {
@@ -20,7 +21,7 @@ def build-container [] {
         .)
 }
 
-def run-container [$no_krun: bool, $host_net: bool] {
+def run-container [$no_krun: bool, $host_net: bool, $isolated: bool] {
     let use_krun = not $no_krun and not $host_net
 
     let runtime_args = if $use_krun {
@@ -39,10 +40,17 @@ def run-container [$no_krun: bool, $host_net: bool] {
         ["runuser", "-u", $user, "--", $shell]
     } else {
         [$shell]
-    } 
+    }
+
+    let work_args = if $isolated {
+        []
+    } else {
+        ["-v", $"($env.PWD):/work:rw,Z", "--workdir", "/work"]
+    }
 
     (podman run -it --rm
         -v $"($sandbox_home):/home/($user):rw,Z"
+        ...$work_args
         --userns keep-id
         ...$runtime_args
         ...$net_args
