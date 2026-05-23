@@ -18,7 +18,7 @@ def build-container [] {
         --build-arg $"user=($user)"
         --build-arg $"uid=(id -u)"
         --build-arg $"gid=(id -g)"
-        .)
+        $env.FILE_PWD)
 }
 
 def run-container [$no_krun: bool, $host_net: bool, $isolated: bool] {
