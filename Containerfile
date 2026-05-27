@@ -9,6 +9,7 @@ RUN pacman -Syu --noconfirm && \
            helix               \
            jujutsu             \
            just                \
+           jq                  \
            llvm                \
            nodejs              \
            npm                 \
